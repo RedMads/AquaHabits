@@ -1,0 +1,6 @@
+.env
+.venv/
+test/
+*.pyc
+__pycache__/
+notes.md
