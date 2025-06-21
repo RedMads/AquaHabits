@@ -4,3 +4,4 @@ test/
 *.pyc
 __pycache__/
 notes.md
+*.db
