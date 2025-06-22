@@ -35,6 +35,11 @@ class HandleDB:
         self.connection.commit()
 
 
+    def getUserDrinkHistory(self, user_id:str) -> list:
+
+        drink_history = self.cursor.execute(f"SELECT drink_ml, drink_time FROM user_record WHERE user_id = ? ORDER BY drink_time ASC", (user_id,))
+        return drink_history.fetchall()
+
     def isUserSignedIn(self, user_id:str) -> bool:
 
         query = self.cursor.execute("SELECT 1 FROM users WHERE user_id = ? LIMIT 1", (user_id,))
@@ -63,3 +68,4 @@ if __name__ == "__main__":
 
     #print(db.addUser("test", 3500))
     print(db.isUserSignedIn("test"))
+    print(db.getUserDrinkHistory("892452900"))
