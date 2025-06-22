@@ -65,7 +65,3 @@ if __name__ == "__main__":
     # test commands
     
     db = HandleDB("database.db")
-
-    #print(db.addUser("test", 3500))
-    print(db.isUserSignedIn("test"))
-    print(db.getUserDrinkHistory("892452900"))
