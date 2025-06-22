@@ -1,6 +1,7 @@
 from telegram import Update, ForceReply
 from telegram.ext import Updater, CommandHandler, MessageHandler, filters, CallbackContext, ContextTypes, Application, ConversationHandler
 from database import HandleDB
+from datetime import datetime
 from dotenv import load_dotenv
 import os
 
@@ -11,6 +12,32 @@ class BotOperations:
 
 		self.BOT_TOKEN = bot_token
 		self.db = HandleDB("database.db")
+
+
+	def formatUserDrinks(self, data:list) -> str:
+
+		amount = []
+		timestamps = []
+		formatted_timestamps = []
+		formatted_reply = ""
+
+		for record in data:
+			amount.append(record[0])
+			timestamps.append(record[1])
+
+		for timestamp in timestamps:
+		
+			dt = datetime.fromtimestamp(int(timestamp))
+			formatted_time = dt.strftime('%Y-%m-%d %H:%M:%S')
+			formatted_timestamps.append(formatted_time)
+
+
+		for i in range(len(formatted_timestamps)):
+			formatted_reply += f"{formatted_timestamps[i]} : {amount[i]} ml\n"
+
+
+		return formatted_reply
+
 		
 
 	async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -43,6 +70,13 @@ class BotOperations:
 
 		await update.message.reply_text("How much water you drink ?")
 		context.user_data["waiting_drink"] = True
+
+	async def progressCommand(self, update:Update, context:ContextTypes.DEFAULT_TYPE) -> None:
+		
+		user_id = str(update.effective_user.id)
+		user_drinks = self.db.getUserDrinkHistory(user_id)
+		await update.message.reply_text(self.formatUserDrinks(user_drinks))
+		
 
 
 	async def chatHandling(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -92,6 +126,7 @@ class BotOperations:
 		application.add_handler(CommandHandler("help", self.helpCommand))
 		application.add_handler(CommandHandler("setgoal", self.setGoalCommand))
 		application.add_handler(CommandHandler("drink", self.drinkCommand))
+		application.add_handler(CommandHandler("progress", self.progressCommand))
 
 		# chat handler !
 		application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, self.chatHandling))
