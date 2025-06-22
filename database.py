@@ -26,6 +26,14 @@ class HandleDB:
         self.cursor.execute(f"UPDATE users SET goal_ml = ? WHERE user_id = ? ", (str(new_goal), user_id,))
         self.connection.commit()
 
+    
+    def userDrinkWater(self, user_id:str, drink_ml:str) -> None:
+
+        current_time = str(int(time.time()))
+
+        self.cursor.execute(f"INSERT INTO user_record(user_id, drink_ml, drink_time) values (?,?,?)", (user_id, drink_ml, current_time))
+        self.connection.commit()
+
 
     def isUserSignedIn(self, user_id:str) -> bool:
 
