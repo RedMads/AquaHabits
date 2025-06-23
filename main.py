@@ -3,7 +3,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, filters, Callb
 from database import HandleDB
 from datetime import datetime
 from dotenv import load_dotenv
-import os
+import os, time
 
 
 class BotOperations:
@@ -13,39 +13,47 @@ class BotOperations:
 		self.BOT_TOKEN = bot_token
 		self.db = HandleDB("database.db")
 
+	def unixtimeToIsoFormat(self,timestamp:str) -> str:
 
-	def formatUserDrinks(self, data:list) -> str:
+		dt = datetime.fromtimestamp(int(timestamp))
+		formatted = dt.strftime("%Y-%m-%d %H:%M")
 
-		amount = []
-		timestamps = []
-		formatted_timestamps = []
-		formatted_reply = ""
+		return formatted
+
+
+	def formatUserDrinks(self, data:list, user_id:str) -> str:
+
+		today_records = []
+		today_amount_of_water = 0
+
+		today_date = datetime.today().strftime("%Y-%m-%d")
+		bot_reply = "Today progress:\n\n"
 
 		for record in data:
-			amount.append(record[0])
-			timestamps.append(record[1])
+			record_timestamp = self.unixtimeToIsoFormat(record[1])
+			record_date = record_timestamp.split(" ")[0]
+			record_time = record_timestamp.split(" ")[1]
+			amount_of_water = record[0]
+			
+			if record_date == today_date:
+				today_records.append(record)
+				today_amount_of_water += int(record[0])
+				bot_reply += f"{record_time}  |  {amount_of_water} ml\n"
 
-		for timestamp in timestamps:
-		
-			dt = datetime.fromtimestamp(int(timestamp))
-			formatted_time = dt.strftime('%Y-%m-%d %H:%M:%S')
-			formatted_timestamps.append(formatted_time)
+		user_daily_goal = self.db.selectDataFromUser(user_id, "goal_ml")
+		progress_percentage = (today_amount_of_water / int(user_daily_goal)) * 100
+
+		bot_reply += f"\n{str(today_amount_of_water)} ml / {user_daily_goal} ml\n\n"
+		bot_reply += f"{progress_percentage:.1f}%"
+
+		if bot_reply == "Today progress:\n\n":
+			bot_reply += "you don't drink water today !, please use /drink command."
 
 
-		for i in range(len(formatted_timestamps)):
-			formatted_reply += f"{formatted_timestamps[i]} : {amount[i]} ml\n"
-
-
-		return formatted_reply
-
-		
+		return bot_reply
 
 	async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 		user = update.effective_user
-
-		# initialize
-		context.user_data["waiting_goal"] = ""
-		context.user_data["waiting_drink"] = ""
 
 		if not self.db.isUserSignedIn(str(user.id)):
 
@@ -62,21 +70,23 @@ class BotOperations:
 
 
 	async def setGoalCommand(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-		
+
 		await update.message.reply_text("Enter new daily goal: ")
+		context.user_data["waiting_drink"] = False
 		context.user_data["waiting_goal"] = True
 
 	async def drinkCommand(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 		await update.message.reply_text("How much water you drink ?")
+		context.user_data["waiting_goal"] = False
 		context.user_data["waiting_drink"] = True
 
 	async def progressCommand(self, update:Update, context:ContextTypes.DEFAULT_TYPE) -> None:
-		
+
 		user_id = str(update.effective_user.id)
 		user_drinks = self.db.getUserDrinkHistory(user_id)
-		await update.message.reply_text(self.formatUserDrinks(user_drinks))
-		
+		await update.message.reply_text(self.formatUserDrinks(user_drinks, user_id))
+
 
 
 	async def chatHandling(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -131,7 +141,7 @@ class BotOperations:
 		# chat handler !
 		application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, self.chatHandling))
 
-		# run the bot
+
 		application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
