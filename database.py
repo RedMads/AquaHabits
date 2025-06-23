@@ -8,15 +8,15 @@ class HandleDB:
         self.connection = sqlite3.connect(db_path)
         self.cursor = self.connection
 
-        self.cursor.execute("CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY, user_id TEXT,goal_ml TEXT, join_at TEXT)")
-        self.cursor.execute("CREATE TABLE IF NOT EXISTS user_record(id INTEGER PRIMARY KEY, user_id TEXT, drink_ml TEXT, drink_time TEXT)")
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT,goal_ml TEXT, join_at TEXT)")
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS user_record(id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT, drink_ml TEXT, drink_time TEXT)")
 
         self.connection.commit()
 
 
-    def selectDataFromUser(self, user_id:str, target:str) -> str:
+    def selectDataFromUser(self, target:str, table_name:str, user_id:str) -> str:
 
-        query = self.cursor.execute(f"SELECT {target} FROM users WHERE user_id = ?", (user_id,))
+        query = self.cursor.execute(f"SELECT {target} FROM {table_name} WHERE user_id = ?", (user_id,))
         self.connection.commit()
 
         return query.fetchone()[0]
@@ -32,6 +32,11 @@ class HandleDB:
         current_time = str(int(time.time()))
 
         self.cursor.execute(f"INSERT INTO user_record(user_id, drink_ml, drink_time) values (?,?,?)", (user_id, drink_ml, current_time))
+        self.connection.commit()
+
+
+    def deleteHydrationRecord(self, user_id:str) -> None:
+        self.cursor.execute(f"DELETE FROM user_record WHERE user_id = ?", (user_id,))
         self.connection.commit()
 
 

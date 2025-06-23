@@ -40,7 +40,7 @@ class BotOperations:
 				today_amount_of_water += int(record[0])
 				bot_reply += f"{record_time}  |  {amount_of_water} ml\n"
 
-		user_daily_goal = self.db.selectDataFromUser(user_id, "goal_ml")
+		user_daily_goal = self.db.selectDataFromUser("goal_ml", "users", user_id)
 		progress_percentage = (today_amount_of_water / int(user_daily_goal)) * 100
 
 		bot_reply += f"\n{str(today_amount_of_water)} ml / {user_daily_goal} ml\n\n"
@@ -90,6 +90,13 @@ class BotOperations:
 		user_drinks = self.db.getUserDrinkHistory(user_id)
 		await update.message.reply_text(self.formatUserDrinks(user_drinks, user_id))
 
+	
+	async def clearCommand(self, update:Update, context:ContextTypes.DEFAULT_TYPE) -> None:
+		user_id = str(update.effective_user.id)
+
+		self.db.deleteHydrationRecord(user_id)
+		await update.message.reply_text("All hydration records cleared !")
+
 
 
 	async def chatHandling(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -106,7 +113,7 @@ class BotOperations:
 
 				context.user_data["waiting_goal"] = False
 				self.db.updateGoal(user_id, int(user_reply))
-				new_goal_query = self.db.selectDataFromUser(user_id, "goal_ml")
+				new_goal_query = self.db.selectDataFromUser("goal_ml", "users", user_id)
 				await update.message.reply_text(f"daily goal updated to {new_goal_query}!")
 				
 			else:
@@ -140,6 +147,7 @@ class BotOperations:
 		application.add_handler(CommandHandler("setgoal", self.setGoalCommand))
 		application.add_handler(CommandHandler("drink", self.drinkCommand))
 		application.add_handler(CommandHandler("progress", self.progressCommand))
+		application.add_handler(CommandHandler("clear", self.clearCommand))
 
 		# chat handler !
 		application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, self.chatHandling))
