@@ -69,7 +69,16 @@ class BotOperations:
 
 	async def helpCommand(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
-		await update.message.reply_text(f"Help! {update.message.text}")
+		await update.message.reply_text("""
+		/start - Initialize the bot and register the user			  
+		/setgoal - Define your daily hydration target (in ml)
+								  
+		/drink - Record a water consumption entry
+		/progress - Display your current progress toward the daily goal
+								  
+		/clear - clear all hydration records 
+		/help - Show commands and usage instructions
+		""")
 
 
 	async def setGoalCommand(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
