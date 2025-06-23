@@ -44,7 +44,10 @@ class BotOperations:
 		progress_percentage = (today_amount_of_water / int(user_daily_goal)) * 100
 
 		bot_reply += f"\n{str(today_amount_of_water)} ml / {user_daily_goal} ml\n\n"
-		bot_reply += f"{progress_percentage:.1f}%"
+		bot_reply += f"Progress percentage: {progress_percentage:.0f}%"
+
+		if today_amount_of_water == int(user_daily_goal) or today_amount_of_water > int(user_daily_goal):
+			bot_reply += "\n\nCongratulations you hit your daily goal !"
 
 		if bot_reply == "Today progress:\n\n":
 			bot_reply += "you don't drink water today !, please use /drink command."
