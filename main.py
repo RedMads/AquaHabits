@@ -40,7 +40,7 @@ class BotOperations:
 				today_amount_of_water += int(record[0])
 				bot_reply += f"{record_time}  |  {amount_of_water} ml\n"
 
-		user_daily_goal = self.db.selectDataFromUser("goal_ml", "users", user_id)
+		user_daily_goal = self.db.selectDataFromUser("daily_goal_ml", "users", user_id)
 		progress_percentage = (today_amount_of_water / int(user_daily_goal)) * 100
 
 		bot_reply += f"\n{str(today_amount_of_water)} ml / {user_daily_goal} ml\n\n"
@@ -69,16 +69,20 @@ class BotOperations:
 
 	async def helpCommand(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
-		await update.message.reply_text("""
-		/start - Initialize the bot and register the user			  
-		/setgoal - Define your daily hydration target (in ml)
-								  
-		/drink - Record a water consumption entry
-		/progress - Display your current progress toward the daily goal
-								  
-		/clear - clear all hydration records 
-		/help - Show commands and usage instructions
-		""")
+		await update.message.reply_text(
+"""					  
+/start Initialize the bot and register the user	
+									
+/setgoal Define your daily hydration target (in ml)
+							
+/drink Record a water consumption entry
+							
+/progress Display your current progress toward the daily goal
+								
+/clear clear all hydration records
+							
+/help Show commands and usage instructions
+""")
 
 
 	async def setGoalCommand(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -122,7 +126,7 @@ class BotOperations:
 
 				context.user_data["waiting_goal"] = False
 				self.db.updateGoal(user_id, int(user_reply))
-				new_goal_query = self.db.selectDataFromUser("goal_ml", "users", user_id)
+				new_goal_query = self.db.selectDataFromUser("daily_goal_ml", "users", user_id)
 				await update.message.reply_text(f"daily goal updated to {new_goal_query}!")
 				
 			else:
