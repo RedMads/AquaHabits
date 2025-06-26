@@ -71,9 +71,9 @@ class BotOperations:
 
 		if not self.db.isUserSignedIn(str(user.id)):
 
-			# add new user to database with default target of 3000 ml
-			self.db.addUser(str(user.id), 3000)
-			await update.message.reply_html(f" Hi {user.mention_html()} you are using the bot for the first time !, signed with defaul target 3000 ml.")
+			# add new user to database with default target of 2000 ml
+			self.db.addUser(str(user.id), 2000)
+			await update.message.reply_html(f" Hi {user.mention_html()} you are using the bot for the first time !, signed with default target 2000 ml.")
 
 		await update.message.reply_html(rf"Hi {user.mention_html()} !" )
 
