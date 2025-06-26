@@ -1,0 +1,19 @@
+{
+  "en": {
+    "register_welcome": "Hello #username#, welcome to AquaHabits! Your daily hydration goal is set to 2000 ml to help you stay fresh and focused 💧.",
+    "login_welcome": "Welcome back #username# ! , use /help to list commands.",
+    "help": "/start – Set up your AquaHabits profile and get started 🟢\n/setgoal – Choose your daily water goal (in milliliters) 🎯\n/drink – Log how much water you just drank 💧\n/progress – Check today’s progress toward your goal 📊\n/clear – Clear all hydration records if you want a fresh start 🧹\n/help – Show all available commands and how to use them 📘",
+    "set_goal_prompt": "What’s your new daily goal? (in ml) 🎯:",
+    "drink_prompt": "How much water did you drink? (in ml) 💧:",
+    "clear_prompt": "All hydration records have been cleared successfully 🧼.",
+    "goal_success": "Daily goal updated to #new_goal# ml. Good choice ✅.",
+    "goal_fail": "That doesn’t seem right. Please enter a number like 2500 ❌.",
+    "drink_success": "Got it! #amount_of_water_ml# ml added to your progress ✅.",
+    "drink_fail": "Please enter a valid number, like 300 ⚠️.",
+    "chat_fail": "I didn’t understand that. You can type /help to see what’s available 📘.",
+    "daily_progress_empty": "No records logged so far today. Use /drink to add your first one 💧.",
+    "daily_goal_reached": "Well done! You’ve reached your goal for today 🎉.",
+    "daily_progress_title": "Today progress:",
+    "progress_percentage": "#today_amount_of_water# ml / #user_daily_goal# ml"
+  }
+} 

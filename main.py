@@ -3,7 +3,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, filters, Callb
 from database import HandleDB
 from datetime import datetime
 from dotenv import load_dotenv
-import os, time
+import os, json
 
 
 class BotOperations:
@@ -12,6 +12,10 @@ class BotOperations:
 
 		self.BOT_TOKEN = bot_token
 		self.db = HandleDB("database.db")
+
+		# load bot replys
+		with open('ui_responses.json', 'r', encoding='utf-8') as file:
+			self.bot_replys = json.load(file)
 
 	def unixtimeToIsoFormat(self,timestamp:str) -> str:
 
@@ -27,7 +31,7 @@ class BotOperations:
 		today_amount_of_water = 0
 
 		today_date = datetime.today().strftime("%Y-%m-%d")
-		bot_reply = "Today progress:\n\n"
+		bot_reply = f"{self.bot_replys["en"]["daily_progress_title"]}\n\n"
 
 		for record in data:
 			record_timestamp = self.unixtimeToIsoFormat(record[1])
@@ -43,7 +47,7 @@ class BotOperations:
 		user_daily_goal = self.db.selectDataFromUser("daily_goal_ml", "users", user_id)
 		progress_percentage = (today_amount_of_water / int(user_daily_goal)) * 100
 
-		bot_reply += f"\n{str(today_amount_of_water)} ml / {user_daily_goal} ml\n\n"
+		bot_reply += f"\n{self.bot_replys["en"]["progress_percentage"].replace("#today_amount_of_water#", str(today_amount_of_water)).replace("#user_daily_goal#", user_daily_goal)}\n\n"
 		bot_reply += f"Progress percentage: {progress_percentage:.0f}%"
 
 		if today_amount_of_water == int(user_daily_goal) or today_amount_of_water > int(user_daily_goal):
@@ -58,10 +62,10 @@ class BotOperations:
 				if formatted.split(" ")[0] != today_date:
 					self.db.userReachedDailyGoal(user_id)
 
-			bot_reply += "\n\nCongratulations you hit your daily goal !"
+			bot_reply += f"\n\n{self.bot_replys["en"]["daily_goal_reached"]}"
 
-		if bot_reply == "Today progress:\n\n":
-			bot_reply += "you don't drink water today !, please use /drink command."
+		if bot_reply == f"{self.bot_replys["en"]["daily_progress_title"]}\n\n":
+			bot_reply += self.bot_replys["en"]["daily_progress_empty"]
 
 
 		return bot_reply
@@ -73,38 +77,25 @@ class BotOperations:
 
 			# add new user to database with default target of 2000 ml
 			self.db.addUser(str(user.id), 2000)
-			await update.message.reply_html(f" Hi {user.mention_html()} you are using the bot for the first time !, signed with default target 2000 ml.")
+			await update.message.reply_html(self.bot_replys["en"]["register_welcome"].replace("#username#", f"@{user.username}") + "\n\n" + self.bot_replys["en"]["help"])
 
-		await update.message.reply_html(rf"Hi {user.mention_html()} !" )
+		else: await update.message.reply_text(self.bot_replys["en"]["login_welcome"].replace("#username#", f"@{user.username}"))
 
 
 	async def helpCommand(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
-		await update.message.reply_text(
-"""					  
-/start Initialize the bot and register the user	
-									
-/setgoal Define your daily hydration target (in ml)
-							
-/drink Record a water consumption entry
-							
-/progress Display your current progress toward the daily goal
-								
-/clear clear all hydration records
-							
-/help Show commands and usage instructions
-""")
+		await update.message.reply_text(self.bot_replys["en"]["help"])
 
 
 	async def setGoalCommand(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
-		await update.message.reply_text("Enter new daily goal: ")
+		await update.message.reply_text(self.bot_replys["en"]["set_goal_prompt"])
 		context.user_data["waiting_drink"] = False
 		context.user_data["waiting_goal"] = True
 
 	async def drinkCommand(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
-		await update.message.reply_text("How much water you drink ?")
+		await update.message.reply_text(self.bot_replys["en"]["drink_prompt"])
 		context.user_data["waiting_goal"] = False
 		context.user_data["waiting_drink"] = True
 
@@ -119,7 +110,7 @@ class BotOperations:
 		user_id = str(update.effective_user.id)
 
 		self.db.deleteHydrationRecord(user_id)
-		await update.message.reply_text("All hydration records cleared !")
+		await update.message.reply_text(self.bot_replys["en"]["clear_prompt"])
 
 
 
@@ -138,10 +129,10 @@ class BotOperations:
 				context.user_data["waiting_goal"] = False
 				self.db.updateGoal(user_id, int(user_reply))
 				new_goal_query = self.db.selectDataFromUser("daily_goal_ml", "users", user_id)
-				await update.message.reply_text(f"daily goal updated to {new_goal_query}!")
+				await update.message.reply_text(self.bot_replys["en"]["goal_success"].replace("#new_goal#", new_goal_query))
 				
 			else:
-				await update.message.reply_text("Please enter correct value for new goal ex. 3000")
+				await update.message.reply_text(self.bot_replys["en"]["goal_fail"])
 
 		elif context.user_data["waiting_drink"]:
 
@@ -151,13 +142,13 @@ class BotOperations:
 
 				context.user_data["waiting_drink"] = False
 				self.db.userDrinkWater(user_id, user_reply)
-				await update.message.reply_text(f"you drink {user_reply} ml of water !")
+				await update.message.reply_text(self.bot_replys["en"]["drink_success"].replace("#amount_of_water_ml#", user_reply))
 
 			else:
-				await update.message.reply_text("Please enter correct amount of water ex. 300")
+				await update.message.reply_text(self.bot_replys["en"]["drink_fail"])
 
 		else:
-			await update.message.reply_text("select /help to view all commands.")
+			await update.message.reply_text(self.bot_replys["en"]["chat_fail"])
 
 
 
