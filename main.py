@@ -47,6 +47,17 @@ class BotOperations:
 		bot_reply += f"Progress percentage: {progress_percentage:.0f}%"
 
 		if today_amount_of_water == int(user_daily_goal) or today_amount_of_water > int(user_daily_goal):
+			user_daily_goals = self.db.userAllDailyGoals(user_id)
+			if len(user_daily_goals) == 0:
+				self.db.userReachedDailyGoal(user_id)
+
+			else:
+				last_daily_goal = user_daily_goals[-1][0]
+				formatted = self.unixtimeToIsoFormat(last_daily_goal)
+
+				if formatted.split(" ")[0] != today_date:
+					self.db.userReachedDailyGoal(user_id)
+
 			bot_reply += "\n\nCongratulations you hit your daily goal !"
 
 		if bot_reply == "Today progress:\n\n":

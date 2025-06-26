@@ -10,6 +10,7 @@ class HandleDB:
 
         self.cursor.execute("CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT, daily_goal_ml TEXT, joined_at TEXT)")
         self.cursor.execute("CREATE TABLE IF NOT EXISTS hydration_logs(id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT, amount_ml TEXT, logged_at TEXT)")
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS daily_goal_achievements(id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT, achieved_at TEXT)")
 
         self.connection.commit()
 
@@ -37,6 +38,7 @@ class HandleDB:
 
     def deleteHydrationRecord(self, user_id:str) -> None:
         self.cursor.execute(f"DELETE FROM hydration_logs WHERE user_id = ?", (user_id,))
+        self.cursor.execute(f"DELETE FROM daily_goal_achievements WHERE user_id = ?", (user_id,))
         self.connection.commit()
 
 
@@ -53,6 +55,20 @@ class HandleDB:
             return False # user does not exist !
         
         else: return True
+
+    def userReachedDailyGoal(self, user_id:str) -> None:
+
+        current_time = str(int(time.time()))
+
+        self.cursor.execute("INSERT INTO daily_goal_achievements(user_id, achieved_at) VALUES (?,?)", (user_id, current_time,))
+        self.connection.commit()
+
+    def userAllDailyGoals(self, user_id:str) -> int:
+
+        query = self.cursor.execute("SELECT achieved_at FROM daily_goal_achievements WHERE user_id = ?  ORDER BY achieved_at ASC", (user_id,))
+        
+        return query.fetchall()
+
 
     def addUser(self, user_id:str, daily_goal_ml:int) -> str:
 
