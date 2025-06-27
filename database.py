@@ -35,6 +35,18 @@ class HandleDB:
         self.cursor.execute(f"INSERT INTO hydration_logs(user_id, amount_ml, logged_at) values (?,?,?)", (user_id, amount_ml, current_time))
         self.connection.commit()
 
+    def getAllUserIDs(self) -> list:
+
+        query = self.cursor.execute("SELECT user_id FROM users")
+
+        user_ids = []
+
+        for user_id in query.fetchall():
+            user_ids.append(user_id[0])
+
+
+        return user_ids
+
 
     def deleteHydrationRecord(self, user_id:str) -> None:
         self.cursor.execute(f"DELETE FROM hydration_logs WHERE user_id = ?", (user_id,))

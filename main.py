@@ -8,14 +8,17 @@ import os, json
 
 class BotOperations:
 
-	def __init__(self, bot_token:str) -> None:
+	def __init__(self, bot_token:str, admin_user_id:str) -> None:
 
 		self.BOT_TOKEN = bot_token
+		self.ADMIN_USER_ID = admin_user_id
 		self.db = HandleDB("database.db")
 
 		# load bot replys
 		with open('ui_responses.json', 'r', encoding='utf-8') as file:
 			self.bot_replys = json.load(file)
+			
+		file.close()
 
 	def unixtimeToIsoFormat(self,timestamp:str) -> str:
 
@@ -81,7 +84,29 @@ class BotOperations:
 
 		else: await update.message.reply_text(self.bot_replys["en"]["login_welcome"].replace("#username#", f"@{user.username}"))
 
+	async def msgall(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+		user = update.effective_user
 
+		if str(user.id) == self.ADMIN_USER_ID:
+
+			user_ids = self.db.getAllUserIDs()
+			broadcast_message = " ".join(context.args)
+			success = 0
+			fail = 0
+
+			for user_id in user_ids:
+
+				try: 
+					await context.bot.send_message(chat_id=user_id, text=broadcast_message)
+					success += 1
+
+				except:
+					fail += 1
+					continue
+
+			await update.message.reply_text(f"sent to {str(success)} users, failed for {str(fail)} users.")
+
+			
 	async def helpCommand(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 		await update.message.reply_text(self.bot_replys["en"]["help"])
@@ -164,6 +189,9 @@ class BotOperations:
 		application.add_handler(CommandHandler("progress", self.progressCommand))
 		application.add_handler(CommandHandler("clear", self.clearCommand))
 
+		# admin commands
+		application.add_handler(CommandHandler("msgall", self.msgall))
+
 		# chat handler !
 		application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, self.chatHandling))
 
@@ -174,8 +202,9 @@ class BotOperations:
 if __name__ == "__main__":
 	load_dotenv()
 	BOT_TOKEN = os.getenv("BOT_TOKEN")
+	ADMIN_USER_ID = os.getenv("ADMIN_USER_ID") # load admin user id
 
-	bot = BotOperations(BOT_TOKEN)
+	bot = BotOperations(BOT_TOKEN, ADMIN_USER_ID)
 
 	print("bot started !")
 	bot.run()
