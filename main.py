@@ -124,8 +124,8 @@ class BotOperations:
 			
 			# new entered goal must be digits and less than 4 digits
 			# ex. 2000, 2300, 1000
-			if user_reply.isdigit() and len(user_reply) <= 4:
-
+			if user_reply.isdigit() and len(user_reply) <= 4 and user_reply[0] != "0":
+				
 				context.user_data["waiting_goal"] = False
 				self.db.updateGoal(user_id, int(user_reply))
 				new_goal_query = self.db.selectDataFromUser("daily_goal_ml", "users", user_id)
@@ -138,7 +138,7 @@ class BotOperations:
 
 			# input vaildation for new amount of water
 			# vaild inputs 300, 200, 214, 10, 20
-			if user_reply.isdigit() and len(user_reply) <= 3:
+			if user_reply.isdigit() and len(user_reply) <= 3 and user_reply[0] != "0":
 
 				context.user_data["waiting_drink"] = False
 				self.db.userDrinkWater(user_id, user_reply)
