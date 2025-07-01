@@ -3,7 +3,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, filters, Callb
 from database import HandleDB
 from datetime import datetime
 from dotenv import load_dotenv
-import os, json
+import os, json, re
 
 
 class BotOperations:
@@ -199,12 +199,52 @@ class BotOperations:
 		application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
+
+def setup_bot():
+
+    print("Setup:")
+    print("It seems this is your first time running the bot. You need to specify the Bot Token and Admin User ID to start the bot.\n")
+
+    bot_token = input("Enter bot token: ")
+    admin_user_id = ""
+
+    # Simple Telegram token validation
+    if ":" in bot_token and bot_token.split(":")[0].isdigit() and not bot_token.split(":")[1].isdigit():
+        set_admin = input("Do you want to set admin to your bot? (special commands for you) (y/n): ")
+
+        admin_user_id = ""
+        if set_admin.lower() == "y":
+
+            admin_user_id = input("Enter your Telegram user ID: ") or ""
+
+            if not admin_user_id.isdigit():
+                print("Incorrect value. Please enter only digits.")
+                return False
+		
+        # Write to .env file
+        with open(".env", "w") as env_file:
+            env_file.write(f'BOT_TOKEN="{bot_token}"\nADMIN_USER_ID="{admin_user_id}"')
+
+        env_file.close()
+        print("file .env created successfully.")
+        return True
+
+    else:
+        print("Please enter a correct Telegram bot token.")
+        return False
+
+
 if __name__ == "__main__":
-	load_dotenv()
-	BOT_TOKEN = os.getenv("BOT_TOKEN")
-	ADMIN_USER_ID = os.getenv("ADMIN_USER_ID") # load admin user id
 
-	bot = BotOperations(BOT_TOKEN, ADMIN_USER_ID)
+	if not os.path.exists(".env"):
+		setup_bot()
 
-	print("bot started !")
-	bot.run()
+	else:
+		load_dotenv()
+		BOT_TOKEN = os.getenv("BOT_TOKEN")
+		ADMIN_USER_ID = os.getenv("ADMIN_USER_ID") # load admin user id
+
+		bot = BotOperations(BOT_TOKEN, ADMIN_USER_ID)
+
+		print("bot started !")
+		bot.run()
