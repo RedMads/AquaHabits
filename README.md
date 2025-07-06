@@ -3,8 +3,8 @@
     <h1>Aqua Habits Bot</h1>
     <p><em>Keep track of your hydration habits.</em></p>
     <br/>
-    <a href="https://github.com/RedMads/AquaHabits/blob/main/LICENSE">
-        <img src="https://img.shields.io/github/license/RedMads/AquaHabits?color=blue" alt="License"/>
+    <a href="LICENSE">
+        <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"/>
     </a>
     <a href="https://github.com/RedMads/AquaHabits/releases/latest">
         <img src="https://img.shields.io/github/v/release/RedMads/AquaHabits?label=version" alt="Current version"/>
@@ -26,13 +26,14 @@
 
 Aqua Habits is a Telegram bot designed to help you build and maintain healthy habits with ease. Track your progress and stay motivated—all within your favorite messaging app.
 
+👉 [Try AquaHabits on Telegram!](https://t.me/AquaHabits_bot)
+
 ---
 
 ## 🎬 Demo
 
-![Usage Demo](assets/usage.mp4)
+<video src="assets/usage.mp4" controls width="400"></video>
 
----
 
 ## 🚀 Getting Started
 
@@ -64,15 +65,13 @@ python3 main.py
 
 On first run, a `.env` file will be created. Add your `BOT_TOKEN` (from [@BotFather](https://t.me/BotFather)) and optionally set `ADMIN_USER_ID`.
 
----
-
 ## 🛠 Features
 - Track daily habits
 - Telegram chat interface
 - Admin controls
 - Easy self-hosting
 
----
+
 
 ## 🔒 Privacy & Data Control
 
@@ -86,17 +85,23 @@ Your privacy is our priority. Aqua Habits will never use your data for advertisi
 
 No other personal information is collected or stored. All data remains on the cloud and is never shared.
 
----
+
 
 ## 🤝 Contributing
 Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
 
----
+
 
 ## 📄 License
 This project is licensed under the MIT License.
 
----
+
 
 ## 📬 Contact
 For questions or support, open an issue or contact [RedMads](https://github.com/RedMads).
+
+
+
+## 🙏 Acknowledgments
+- Thanks to all contributors and open-source libraries that made this project possible.
+
