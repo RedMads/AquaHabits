@@ -20,7 +20,7 @@
     </a>
 </div>
 
----
+
 
 ## 🌊 Overview
 
@@ -28,7 +28,6 @@ Aqua Habits is a Telegram bot designed to help you build and maintain healthy ha
 
 👉 [Try AquaHabits on Telegram!](https://t.me/AquaHabits_bot)
 
----
 
 ## 🎬 Demo
 
