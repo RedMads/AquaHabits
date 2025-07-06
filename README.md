@@ -34,7 +34,10 @@ Aqua Habits is a Telegram bot designed to help you build and maintain healthy ha
 
 ## 🎬 Demo
 
-<video src="assets/usage.mp4" controls width="400"></video>
+<video width="400" height="480" controls>
+  <source src="assets/usage.mp4" type="video/mp4">
+</video>
+
 <br/>
 
 ## 🚀 Getting Started
@@ -96,12 +99,17 @@ No other personal information is collected or stored. All data remains on the cl
 ## 🤝 Contributing
 Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
 
+<br/>
 
 ## 📄 License
 This project is licensed under the MIT License.
 
+<br/>
+
 ## 📬 Contact
 For questions or support, open an issue or contact [RedMads](https://github.com/RedMads).
+
+<br/>
 
 ## 🙏 Acknowledgments
 - Thanks to all contributors and open-source libraries that made this project possible.
